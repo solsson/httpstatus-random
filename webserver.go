@@ -21,7 +21,10 @@ var (
 func status(w http.ResponseWriter, r *http.Request) {
 	status := statusCodesCommonWeighted[rand.Intn(len(statusCodesCommonWeighted))]
 	w.WriteHeader(status)
-	io.WriteString(w, fmt.Sprintf("Responded randomly with status %d\n", status))
+	body := fmt.Sprintf("Responded randomly with status %d\n", status)
+	w.Header().Set("Content-Type", "text/plain")
+	w.Header().Set("Content-Length", fmt.Sprintf("%d", len(body)))
+	io.WriteString(w, body)
 }
 
 func main() {
