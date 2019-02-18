@@ -7,6 +7,7 @@ import (
 	"log"
 	"math/rand"
 	"net/http"
+	"time"
 )
 
 var (
@@ -18,6 +19,11 @@ var (
 		500, 500, 500, 501, 503, 503, 503, 503, 503, 550}
 )
 
+func accesslog(status int, r *http.Request) {
+	t := time.Now().UTC().Format("15:04:05")
+	fmt.Printf("%s %d %s %s %s\n", t, status, r.RemoteAddr, r.Method, r.Header["User-Agent"])
+}
+
 func status(w http.ResponseWriter, r *http.Request) {
 	status := statusCodesCommonWeighted[rand.Intn(len(statusCodesCommonWeighted))]
 	w.WriteHeader(status)
@@ -25,6 +31,7 @@ func status(w http.ResponseWriter, r *http.Request) {
 	w.Header().Set("Content-Type", "text/plain")
 	w.Header().Set("Content-Length", fmt.Sprintf("%d", len(body)))
 	io.WriteString(w, body)
+	accesslog(status, r)
 }
 
 func main() {
